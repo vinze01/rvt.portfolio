@@ -2,6 +2,11 @@
   <a-layout style="min-height: 100vh;">
     <a-layout-header style="background-color: #001529;">
       <a-menu mode="horizontal" theme="dark" style="line-height: 64px; display: flex; justify-content: center;">
+        <a-menu-item key="5" style="margin-right: auto;">
+          <router-link to="/">
+            <img src="/favicon.ico" alt="Logo" style="height: 40px; border-radius: 20px;" />
+          </router-link>
+        </a-menu-item>
         <a-menu-item key="1">
           <router-link to="/" class="nav-link">Home</router-link>
         </a-menu-item>
