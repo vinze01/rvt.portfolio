@@ -23,14 +23,15 @@
             user-friendly solutions. I’m always eager to learn and improve my skills to
             keep up with the latest trends.
           </a-typography-paragraph>
-          <a-button
-            type="primary"
-            href="/about"
-            style="margin-top: 20px; font-size: 16px; border-radius: 5px"
-            data-aos="fade-up"
-          >
-            Learn More About Me
-          </a-button>
+          <router-link to="/about">
+            <a-button
+              type="primary"
+              style="margin-top: 20px; font-size: 16px; border-radius: 5px"
+              data-aos="fade-up"
+            >
+              Learn More About Me
+            </a-button>
+          </router-link>
         </a-col>
       </a-row>
     </a-layout-content>

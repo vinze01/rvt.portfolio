@@ -5,7 +5,7 @@
         My Projects
       </h1>
       <a-row gutter="16">
-        <a-col span="8" v-for="project in projects" :key="project.id">
+        <a-col :xs="24" :sm="24" :lg="8" :xl="8" v-for="project in projects" :key="project.id">
           <a-card
             :title="project.title"
             hoverable
@@ -42,7 +42,9 @@
           </ul>
           <h3>Github:</h3>
           <ul>
-            <li v-for="git in selectedProject.github" :key="git"><a>{{ git }}</a></li>
+            <li v-for="git in selectedProject.github" :key="git">
+              <a :href="git" target="_blank" rel="noopener noreferrer">{{ git }}</a>
+            </li>
           </ul>
         </div>
       </a-modal>
@@ -138,7 +140,7 @@ export default defineComponent({
           ],
           github: [
             'https://github.com/vinze01/ft-client',
-            'https://github.com/vinze01/ft-service',
+            'https://github.com/vinze01/ft-server',
           ],
         },
       ] as Project[],
@@ -174,7 +176,8 @@ export default defineComponent({
 
 .project-image {
   width: 100%;
-  height: 200px;
+  height: auto; 
+  max-height: 200px;
   object-fit: cover;
   border-radius: 10px 10px 0 0;
 }
@@ -182,5 +185,17 @@ export default defineComponent({
 .project-description {
   margin-top: 12px;
   text-align: justify;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .project-card {
+    margin-bottom: 16px;
+  }
+
+  .project-description {
+    font-size: 12px;
+  }
 }
 </style>
+
