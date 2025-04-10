@@ -29,7 +29,7 @@
         @cancel="closeModal"
         width="800px"
       >
-        <img :src="selectedProject?.image" alt="Project Image" class="project-image" style="margin-bottom: 16px;" />
+        <img :src="selectedProject?.image" alt="Project Image" class="project-image" />
         <div v-if="selectedProject">
           <p>{{ selectedProject.longDescription }}</p>
           <h3>Key Features:</h3>
@@ -40,6 +40,16 @@
           <ul>
             <li v-for="tech in selectedProject.technologies" :key="tech">{{ tech }}</li>
           </ul>
+
+          <div v-if="selectedProject.id === 4">
+            <h3>Website:</h3>
+            <ul>
+              <li v-for="link in selectedProject.website" :key="link">
+                <a :href="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+              </li>
+            </ul>
+          </div>
+
           <h3>Github:</h3>
           <ul>
             <li v-for="git in selectedProject.github" :key="git">
@@ -65,7 +75,8 @@ interface Project {
   longDescription: string;
   features: string[];
   technologies: string[];
-  github: string[]
+  github: string[];
+  website: string[]
 }
 
 export default defineComponent({
@@ -143,6 +154,31 @@ export default defineComponent({
             'https://github.com/vinze01/ft-server',
           ],
         },
+        {
+          id: 4,
+          title: "Task Management System",
+          image: require("@/assets/task-management.png"),
+          description: "An application that allows users to create a to-do list...",
+          longDescription: "This app allows users to view, add, and manage tasks with persistence via localStorage. The app also includes a login page, task completion, deletion features, and a custom modal for user login notifications.",
+          features: [
+            "Task Management: View, add, and complete tasks",
+            "Persistence: Tasks and user data are stored using localStorage.",
+            "Login Page: Includes form validation and CAPTCHA; users can log in and view a personalized greeting.",
+            "Logout Functionality: Users can log out, clear tasks, and their session is cleared.",
+          ],
+          technologies: [
+            "Vue 3: JavaScript framework for building user interfaces.", 
+            "Pinia: State management library for Vue 3.", 
+            "Vue Router: Routing library for single-page applications (SPA).",
+            "TypeScript: Type-safe language that compiles to JavaScript."
+          ],
+          website: [
+            'https://rvt-task-management.netlify.app/'
+          ],
+          github: [
+            'https://github.com/vinze01/task-management'
+          ],
+        },
       ] as Project[],
       isModalVisible: false,
       selectedProject: null as Project | null,
@@ -177,7 +213,7 @@ export default defineComponent({
 .project-image {
   width: 100%;
   height: auto; 
-  max-height: 200px;
+  max-height: 500px;
   object-fit: cover;
   border-radius: 10px 10px 0 0;
 }

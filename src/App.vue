@@ -36,7 +36,7 @@
     </a-layout-content>
 
     <a-layout-footer style="text-align: center; background-color: #001529; color: white;">
-      ©2024 RVT
+      © {{ new Date().getFullYear() }} RVT
     </a-layout-footer>
   </a-layout>
 </template>
