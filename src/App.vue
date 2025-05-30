@@ -49,7 +49,7 @@
     </button>
 
     <a-layout-footer style="text-align: center; background-color: #001529; color: white">
-      © {{ new Date().getFullYear() }} RVT & MAD
+      © {{ new Date().getFullYear() }} RVT
     </a-layout-footer>  
   </a-layout>
 </template>
