@@ -1,180 +1,477 @@
 <template>
-  <a-layout style="min-height: 100vh">
-
-    <a-layout-header style="background-color: #001529">
-      <a-menu
-        mode="horizontal"
-        theme="dark"
-        style="line-height: 64px; display: flex; justify-content: center"
-      >
-        <a-menu-item key="5" style="margin-right: auto">
-          <router-link to="/">
-            <img
-              src="/favicon.ico"
-              alt="Logo"
-              style="height: 40px; border-radius: 20px"
-            />
+  <a-layout class="app-layout" :class="{ 'dark-mode': isDark }">
+      <header class="navbar" :class="{ 'scrolled': isScrolled }">
+        <div class="navbar-content">
+          <router-link to="/" class="logo">
+            <img src="/favicon.ico" alt="Logo" class="logo-img" />
+            <span class="logo-text">RVT</span>
           </router-link>
-        </a-menu-item>
-        <a-menu-item key="1">
-          <router-link to="/" class="nav-link">Home</router-link>
-        </a-menu-item>
-        <a-menu-item key="2">
-          <router-link to="/about" class="nav-link">About</router-link>
-        </a-menu-item>
-        <a-menu-item key="3">
-          <router-link to="/projects" class="nav-link">Projects</router-link>
-        </a-menu-item>
-        <a-menu-item key="4">
-          <router-link to="/contact" class="nav-link">Contact</router-link>
-        </a-menu-item>
-      </a-menu>
-    </a-layout-header>
+          
+          <nav class="nav-menu" :class="{ 'mobile-open': mobileMenuOpen }">
+            <router-link to="/" class="nav-link" @click="closeMobileMenu">Home</router-link>
+            <router-link to="/about" class="nav-link" @click="closeMobileMenu">About</router-link>
+            <router-link to="/projects" class="nav-link" @click="closeMobileMenu">Projects</router-link>
+            <router-link to="/contact" class="nav-link" @click="closeMobileMenu">Contact</router-link>
+          </nav>
 
-    <a-layout-content style="padding: 24px; background-color: #f0f2f5">
-      <router-view />
-    </a-layout-content>
+          <div class="nav-actions">
+            <button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Light Mode' : 'Dark Mode'">
+              <BulbOutlined v-if="!isDark" />
+              <BulbFilled v-else />
+            </button>
+            <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
+              <MenuOutlined v-if="!mobileMenuOpen" />
+              <CloseOutlined v-else />
+            </button>
+          </div>
+        </div>
+      </header>
 
-    <div class="chatbot-container" :class="{ 'chatbot-visible': showChat }">
-      <iframe
-        src="https://www.chatbase.co/chatbot-iframe/abPmfHcu5WC8SJMnd2Xaa"
-        width="100%"
-        height="100%"
-        frameborder="0"
-      ></iframe>
-    </div>
+      <a-layout-content class="main-content">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" :is-dark="isDark" />
+          </transition>
+        </router-view>
+      </a-layout-content>
 
-    <button class="floating-button" @click="showChat = !showChat">
-      <component :is="showChat ? 'DownOutlined' : 'MessageOutlined'" />
-    </button>
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="social-links">
+            <a href="https://github.com/vinze01" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
+              <GithubOutlined />
+            </a>
+            <a href="https://www.linkedin.com/in/rvt-dev/" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
+              <LinkedinOutlined />
+            </a>
+            <a href="https://www.facebook.com/veeenss/" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
+              <FacebookOutlined />
+            </a>
+          </div>
+          <p class="copyright">© {{ new Date().getFullYear() }} Robin Vince Tupil. All rights reserved.</p>
+        </div>
+      </footer>
 
-    <a-layout-footer style="text-align: center; background-color: #001529; color: white">
-      © {{ new Date().getFullYear() }} RVT
-    </a-layout-footer>  
-  </a-layout>
+      <div class="chatbot-container" :class="{ 'chatbot-visible': showChat }">
+        <iframe
+          src="https://www.chatbase.co/chatbot-iframe/abPmfHcu5WC8SJMnd2Xaa"
+          width="100%"
+          height="100%"
+          frameborder="0"
+        ></iframe>
+      </div>
+
+      <button class="floating-button" @click="showChat = !showChat">
+        <MessageOutlined v-if="!showChat" />
+        <CloseOutlined v-else />
+      </button>
+    </a-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { MessageOutlined, DownOutlined } from "@ant-design/icons-vue";
+import { defineComponent, ref, onMounted, onUnmounted } from "vue";
+import { 
+  BulbOutlined,
+  BulbFilled,
+  MenuOutlined, 
+  CloseOutlined,
+  MessageOutlined,
+  GithubOutlined,
+  LinkedinOutlined,
+  FacebookOutlined,
+} from "@ant-design/icons-vue";
 
 export default defineComponent({
   name: "App",
   components: {
+    BulbOutlined,
+    BulbFilled,
+    MenuOutlined,
+    CloseOutlined,
     MessageOutlined,
-    DownOutlined,
+    GithubOutlined,
+    LinkedinOutlined,
+    FacebookOutlined,
   },
   setup() {
-    const isDarkMode = ref(false);
+    const isDark = ref(false);
     const showChat = ref(false);
+    const mobileMenuOpen = ref(false);
+    const isScrolled = ref(false);
 
-    const toggleTheme = (checked: boolean) => {
-      isDarkMode.value = checked;
-      document.body.className = checked ? "dark-mode" : "";
+    const toggleTheme = () => {
+      isDark.value = !isDark.value;
+      localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
     };
 
+    const closeMobileMenu = () => {
+      mobileMenuOpen.value = false;
+    };
+
+    const handleScroll = () => {
+      isScrolled.value = window.scrollY > 20;
+    };
+
+    onMounted(() => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        isDark.value = savedTheme === 'dark';
+      } else {
+        isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+
     return {
-      isDarkMode,
-      toggleTheme,
+      isDark,
       showChat,
+      mobileMenuOpen,
+      isScrolled,
+      toggleTheme,
+      closeMobileMenu
     };
   },
 });
 </script>
 
 <style>
-/* Dark Mode Styles */
-.dark-mode {
-  background-color: #1a1a1a;
-  color: white;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-bg: #fafafa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-text: #27272a;
+  --color-text-secondary: #71717a;
+  --color-border: #e4e4e7;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-bg: linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%);
 }
 
-.dark-mode a-layout-content {
-  background-color: #2b2b2b;
+[data-theme="dark"] {
+  --color-bg: #0f0f14;
+  --color-bg-secondary: #18181b;
+  --color-bg-card: #1e1e2e;
+  --color-text: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-border: #3f3f46;
+  --glass-bg: rgba(30, 30, 46, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  --gradient-bg: linear-gradient(135deg, #0f0f14 0%, #18181b 100%);
 }
 
-.dark-mode a-layout-footer {
-  background-color: #001529;
-  color: white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.dark-mode a-menu {
-  background-color: #001529;
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.dark-mode a-menu-item {
-  color: white;
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--gradient-bg);
 }
 
-/* Navigation Links */
-.nav-link {
-  color: white;
-  text-decoration: none;
-  padding: 0 15px;
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1rem 2rem;
   transition: all 0.3s ease;
-  border-radius: 4px;
+  background: transparent;
+}
+
+.navbar.scrolled {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+}
+
+.navbar-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  padding: 0.625rem 1.25rem;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .nav-link:hover {
-  color: white;
-  background-color: #1890ff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+  color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.1);
 }
 
-/* Floating Button */
+.nav-link.router-link-active {
+  color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: scale(1.05);
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px;
+}
+
+.footer {
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  padding: 2rem;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.social-link {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.social-link:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.copyright {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
 .floating-button {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background-color: #1890ff;
+  background: var(--gradient-primary);
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  font-size: 28px;
+  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  font-size: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 999;
 }
 
 .floating-button:hover {
-  background-color: #40a9ff;
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.4);
 }
 
-.floating-button svg {
-  font-size: 24px;
-}
-
-/* Chatbot Panel */
 .chatbot-container {
   position: fixed;
   bottom: 100px;
   right: 30px;
   width: 400px;
   height: 600px;
-  max-width: 90vw;
+  max-width: calc(100vw - 60px);
   z-index: 998;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  background: white;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  transform: translateY(100%);
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(100%) scale(0.9);
   opacity: 0;
   pointer-events: none;
-  transition: transform 0.35s ease, opacity 0.35s ease;
-  will-change: transform, opacity;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chatbot-visible {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   opacity: 1;
   pointer-events: auto;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.5rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .nav-menu.mobile-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-link {
+    padding: 0.875rem 1rem;
+    border-radius: 10px;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .chatbot-container {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 100px;
+    height: calc(100vh - 180px);
+  }
 }
 </style>
