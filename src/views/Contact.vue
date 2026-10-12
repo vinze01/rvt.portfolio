@@ -1,139 +1,87 @@
 <template>
-  <div class="contact-page">
-    <section class="contact-hero">
-      <div class="container">
-        <h1 class="page-title">Get In Touch</h1>
-        <p class="page-subtitle">Have a project in mind? Let's work together!</p>
+  <div class="contact">
+    <section class="page-head">
+      <div class="wrap">
+        <p class="kicker" v-reveal>Contact</p>
+        <h1 class="display contact-title" v-reveal="{ delay: 80 }">
+          Let's make<br />something <em>real</em><span class="accent-word">.</span>
+        </h1>
+        <p class="lead" v-reveal="{ delay: 140 }">
+          Open to full-time roles, freelance builds, and collaborations.
+          The fastest route is email. The form below opens your mail app with everything pre-filled.
+        </p>
       </div>
     </section>
 
-    <section class="contact-content">
-      <div class="container">
-        <div class="contact-grid">
-          <div class="contact-info">
-            <h2>Let's Connect</h2>
-            <p class="info-description">
-              I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions. Feel free to reach out through any of the following channels.
-            </p>
-            
-            <div class="contact-methods">
-              <div class="contact-method">
-                <div class="method-icon">
-                  <MailOutlined />
-                </div>
-                <div class="method-details">
-                  <span class="method-label">Email</span>
-                  <a href="mailto:robin.vince01@gmail.com" class="method-value">
-                    robin.vince01@gmail.com
-                  </a>
-                </div>
-              </div>
-              
-              <div class="contact-method">
-                <div class="method-icon">
-                  <EnvironmentOutlined />
-                </div>
-                <div class="method-details">
-                  <span class="method-label">Location</span>
-                  <span class="method-value">Las Piñas City, Philippines</span>
-                </div>
-              </div>
-              
-              <div class="contact-method">
-                <div class="method-icon">
-                  <ClockCircleOutlined />
-                </div>
-                <div class="method-details">
-                  <span class="method-label">Availability</span>
-                  <span class="method-value available">Open for opportunities</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="social-section">
-              <h3>Find Me On</h3>
-              <div class="social-links">
-                <a href="https://github.com/vinze01" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
-                  <GithubOutlined />
-                </a>
-                <a href="https://www.linkedin.com/in/rvt-dev/" target="_blank" rel="noopener noreferrer" class="social-link" title="LinkedIn">
-                  <LinkedinOutlined />
-                </a>
-                <a href="https://www.facebook.com/veeenss/" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram">
-                  <FacebookOutlined />
-                </a>
-              </div>
+    <section class="section--tight">
+      <div class="wrap contact-grid">
+        <div class="info">
+          <div class="info-row" v-reveal>
+            <p class="meta-row">Email</p>
+            <a class="big-link" :href="`mailto:${email}`">{{ email }}</a>
+          </div>
+          <div class="info-row" v-reveal>
+            <p class="meta-row">Location</p>
+            <p class="info-val">{{ location }}</p>
+          </div>
+          <div class="info-row" v-reveal>
+            <p class="meta-row">Availability</p>
+            <p class="info-val ok">● {{ availability }}</p>
+          </div>
+          <div class="info-row" v-reveal>
+            <p class="meta-row">Elsewhere</p>
+            <div class="social-row">
+              <a
+                v-for="s in socials"
+                :key="s.label"
+                :href="s.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-btn"
+              >{{ s.label }} ↗</a>
             </div>
           </div>
-
-          <div class="contact-form-wrapper">
-            <form @submit.prevent="sendEmail" class="contact-form">
-              <h2>Send a Message</h2>
-              
-              <div class="form-group">
-                <label for="name">Name</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  v-model="form.name" 
-                  placeholder="Your name"
-                  required
-                />
-              </div>
-              
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  v-model="form.email" 
-                  placeholder="your.email@example.com"
-                  required
-                />
-              </div>
-              
-              <div class="form-group">
-                <label for="subject">Subject</label>
-                <input 
-                  type="text" 
-                  id="subject" 
-                  v-model="form.subject" 
-                  placeholder="What's this about?"
-                  required
-                />
-              </div>
-              
-              <div class="form-group">
-                <label for="message">Message</label>
-                <textarea 
-                  id="message" 
-                  v-model="form.message" 
-                  placeholder="Tell me about your project..."
-                  rows="5"
-                  required
-                ></textarea>
-              </div>
-              
-              <button type="submit" class="submit-btn">
-                <SendOutlined />
-                Send Message
-              </button>
-            </form>
-          </div>
+          <p class="note" v-reveal>
+            No backend is wired to this form. Submitting composes an email via
+            <code>mailto:</code> (existing behavior). Nothing is sent silently.
+          </p>
         </div>
+
+        <form class="form" @submit.prevent="sendEmail" v-reveal aria-label="Contact form">
+          <h2>Send a message</h2>
+          <div class="field">
+            <label for="c-name">Name</label>
+            <input id="c-name" v-model="form.name" type="text" placeholder="Your name" required autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="c-email">Email</label>
+            <input id="c-email" v-model="form.email" type="email" placeholder="your.email@example.com" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="c-subject">Subject</label>
+            <input id="c-subject" v-model="form.subject" type="text" placeholder="What's this about?" required />
+          </div>
+          <div class="field">
+            <label for="c-message">Message</label>
+            <textarea id="c-message" v-model="form.message" placeholder="Tell me about your project, timeline, and goals…" rows="6" required></textarea>
+          </div>
+          <button class="btn-craft btn-craft--accent submit" type="submit">
+            Compose email <span aria-hidden="true">→</span>
+          </button>
+          <p class="form-hint">Opens your email client addressed to {{ emailTo }}.</p>
+        </form>
       </div>
     </section>
 
     <a-modal
-      v-model:visible="showSuccessModal"
-      title="Message Sent!"
+      v-model:visible="showSuccess"
+      title="Email composed"
       :footer="null"
-      @ok="showSuccessModal = false"
-      class="success-modal"
+      @cancel="showSuccess = false"
     >
-      <div class="success-content">
-        <CheckCircleOutlined class="success-icon" />
-        <p>Thank you for reaching out! I'll get back to you as soon as possible.</p>
+      <div class="success">
+        <p class="success-mark" aria-hidden="true">✓</p>
+        <p>Your mail app should now be open with the message pre-filled. I'll reply as soon as I can. Thank you for reaching out.</p>
       </div>
     </a-modal>
   </div>
@@ -141,47 +89,33 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { 
-  MailOutlined, 
-  EnvironmentOutlined, 
-  ClockCircleOutlined,
-  GithubOutlined,
-  LinkedinOutlined,
-  FacebookOutlined,
-  SendOutlined,
-  CheckCircleOutlined
-} from "@ant-design/icons-vue";
+import { profile } from "@/data/portfolio";
 
 export default defineComponent({
   name: "Contact",
-  components: {
-    MailOutlined,
-    EnvironmentOutlined,
-    ClockCircleOutlined,
-    GithubOutlined,
-    LinkedinOutlined,
-    FacebookOutlined,
-    SendOutlined,
-    CheckCircleOutlined
-  },
+  props: { isDark: { type: Boolean, default: false } },
   data() {
     return {
-      form: {
-        name: "",
-        email: "",
-        subject: "",
-        message: ""
-      },
-      showSuccessModal: false
+      form: { name: "", email: "", subject: "", message: "" },
+      showSuccess: false,
     };
+  },
+  computed: {
+    email(): string { return profile.email; },
+    emailTo(): string { return profile.emailTo; },
+    location(): string { return profile.location; },
+    availability(): string { return profile.availability; },
+    socials() { return profile.socials; },
   },
   methods: {
     sendEmail() {
+      // Preserved behavior: no backend, compose via mailto, then confirm.
       const subject = encodeURIComponent(this.form.subject);
-      const body = `Name: ${this.form.name}\nEmail: ${this.form.email}\n\nMessage:\n${this.form.message}`;
-      const mailtoLink = `mailto:robinvincetupil@gmail.com?subject=${subject}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoLink;
-      this.showSuccessModal = true;
+      const body = encodeURIComponent(
+        `Name: ${this.form.name}\nEmail: ${this.form.email}\n\nMessage:\n${this.form.message}`
+      );
+      window.location.href = `mailto:${profile.emailTo}?subject=${subject}&body=${body}`;
+      this.showSuccess = true;
       this.form = { name: "", email: "", subject: "", message: "" };
     },
   },
@@ -189,252 +123,77 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.contact-page {
-  min-height: 100vh;
+.page-head { padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2rem, 4vw, 3rem); border-bottom: 1px solid var(--line); }
+.contact-title { font-size: var(--fs-hero); margin: 1rem 0 1.25rem; }
+.contact-title em { font-style: normal; color: var(--accent-strong); }
+[data-theme="dark"] .contact-title em { color: var(--accent); }
+.contact-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+.info-row { padding: 1.4rem 0; border-bottom: 1px solid var(--line); }
+.info-row:first-child { padding-top: 0; }
+.big-link {
+  display: inline-block;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-strong);
+  text-underline-offset: 6px;
+  margin-top: 0.5rem;
+  overflow-wrap: anywhere;
 }
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+.big-link:hover { background: var(--accent-wash); }
+.info-val { font-weight: 600; font-size: 1.05rem; margin-top: 0.4rem; }
+.ok { color: #16a34a; }
+[data-theme="dark"] .ok { color: #4ade80; }
+.social-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.7rem; }
+.social-btn {
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.6rem 1.1rem; font-weight: 600; font-size: 0.9rem; text-decoration: none;
+  transition: border-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out);
 }
+.social-btn:hover { border-color: var(--accent-strong); transform: translateY(-2px); }
+.note { color: var(--faint); font-size: 0.85rem; margin-top: 1.4rem; max-width: 44ch; }
+.note code { font-family: var(--font-mono); font-size: 0.8rem; }
 
-.contact-hero {
-  padding: 4rem 0 3rem;
-  text-align: center;
-  background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg) 100%);
-}
-
-.page-title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-subtitle {
-  font-size: 1.125rem;
-  color: var(--color-text-secondary);
-}
-
-.contact-content {
-  padding: 4rem 0;
-}
-
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 4rem;
-  align-items: start;
-}
-
-.contact-info h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.info-description {
-  color: var(--color-text-secondary);
-  line-height: 1.8;
-  margin-bottom: 2rem;
-}
-
-.contact-methods {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.contact-method {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.method-icon {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-primary);
-  border-radius: 14px;
-  font-size: 1.25rem;
-  color: white;
-}
-
-.method-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.method-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.25rem;
-}
-
-.method-value {
-  font-weight: 600;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.method-value.available {
-  color: #22c55e;
-}
-
-.social-section h3 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.social-links {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.social-link {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  font-size: 1.25rem;
-  color: var(--color-text);
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.social-link:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-  transform: translateY(-3px);
-}
-
-.contact-form-wrapper {
-  background: var(--color-bg-card);
-  padding: 2.5rem;
-  border-radius: 24px;
+.form {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
   box-shadow: var(--shadow-lg);
 }
-
-.contact-form h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-.form-group input,
-.form-group textarea {
+.form h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1.4rem; }
+.field { margin-bottom: 1.1rem; }
+.field label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.45rem; }
+.field input, .field textarea {
   width: 100%;
-  padding: 0.875rem 1rem;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
   font-size: 1rem;
-  color: var(--color-text);
-  transition: all 0.2s ease;
+  color: var(--ink);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
-
-.form-group input:focus,
-.form-group textarea:focus {
+.field input::placeholder, .field textarea::placeholder { color: var(--faint); }
+.field input:focus, .field textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-wash);
 }
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: var(--color-text-secondary);
+.field textarea { resize: vertical; min-height: 140px; }
+.submit { width: 100%; justify-content: center; margin-top: 0.4rem; }
+.form-hint { color: var(--faint); font-size: 0.82rem; margin-top: 0.8rem; text-align: center; }
+.success { text-align: center; padding: 0.75rem 0 0.5rem; }
+.success-mark {
+  width: 64px; height: 64px; margin: 0 auto 1rem;
+  border-radius: 50%; background: var(--accent); color: var(--accent-ink);
+  font-size: 1.8rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
 }
+.success p { color: var(--muted); }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 1rem;
-  background: var(--gradient-primary);
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-}
-
-.success-content {
-  text-align: center;
-  padding: 1rem 0;
-}
-
-.success-icon {
-  font-size: 4rem;
-  color: #22c55e;
-  margin-bottom: 1rem;
-}
-
-.success-content p {
-  color: var(--color-text-secondary);
-  font-size: 1.125rem;
-}
-
-@media (max-width: 968px) {
-  .contact-grid {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-
-  .contact-form-wrapper {
-    padding: 1.5rem;
-  }
-}
-</style>
-
-<style>
-.success-modal .ant-modal-content {
-  background: var(--color-bg-card);
-}
-
-.success-modal .ant-modal-title {
-  color: var(--color-text);
-  font-weight: 700;
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr; }
 }
 </style>
