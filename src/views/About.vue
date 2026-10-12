@@ -23,7 +23,6 @@
       <div class="wrap split">
         <figure class="portrait" v-reveal>
           <img src="@/assets/profile2.jpg" alt="Robin Vince Tupil portrait" />
-          <figcaption class="meta-row">Fig. 02 · working portrait</figcaption>
         </figure>
         <div class="narrative">
           <h2 class="display narr-title" v-reveal>Who I am</h2>
@@ -166,6 +165,7 @@ export default defineComponent({
 .split { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
 .portrait img { border-radius: var(--radius-lg); border: 1px solid var(--line); aspect-ratio: 4 / 5; object-fit: cover; width: 100%; }
 .portrait figcaption { margin-top: 0.7rem; }
+.portrait-cap { display: flex; justify-content: space-between; gap: 1rem; }
 .narr-title { font-size: var(--fs-h2); margin-bottom: 1.2rem; }
 .narrative p { color: var(--muted); margin-bottom: 1rem; max-width: 62ch; }
 .creed { list-style: none; margin-top: 1.75rem; border-top: 1px solid var(--line); }

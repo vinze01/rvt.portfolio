@@ -40,7 +40,7 @@
           <div class="fig-frame">
             <img src="@/assets/profile.jpg" alt="Portrait of Robin Vince Tupil" />
             <figcaption class="fig-cap">
-              <span>RVT · 001</span><span>EST. Craft / Code</span>
+              <span>Robin Vince Tupil</span><span>{{ location }}</span>
             </figcaption>
           </div>
           <div class="fig-stamp" aria-hidden="true">Full&nbsp;Stack<br />Engineer</div>
