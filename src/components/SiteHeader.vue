@@ -209,6 +209,10 @@ export default defineComponent({
   .avail { padding: 0.45rem 0.6rem; }
   .menu-btn { display: inline-flex; }
   .mobile {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
