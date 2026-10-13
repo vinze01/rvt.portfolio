@@ -52,7 +52,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.chat { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 990; display: flex; flex-direction: column; align-items: flex-end; gap: 0.8rem; }
+.chat { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 990; display: flex; flex-direction: column; align-items: flex-end; gap: 0.8rem; pointer-events: none; }
 .chat-panel {
   width: min(400px, calc(100vw - 2.5rem));
   height: min(600px, calc(100dvh - 10rem));
@@ -93,6 +93,7 @@ export default defineComponent({
   color: var(--accent-ink);
   font-size: 1.35rem;
   cursor: pointer;
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;

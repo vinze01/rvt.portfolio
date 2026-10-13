@@ -54,11 +54,20 @@
     </section>
 
     <!-- ============ SKILLS TICKER ============ -->
-    <div class="ticker" aria-hidden="true">
+    <div
+      ref="tickerEl"
+      class="ticker"
+      aria-hidden="true"
+      @pointerdown="onTickDown"
+      @pointermove="onTickMove"
+      @pointerup="onTickUp"
+      @pointerleave="onTickUp"
+      @pointercancel="onTickUp"
+    >
       <div class="ticker-track">
         <span v-for="(s, idx) in tickerTwice" :key="s.name + idx" class="tick">
           <span class="tick-logo">
-            <img :src="s.logo" alt="" loading="lazy" referrerpolicy="no-referrer" @error="onLogoError" />
+            <img :src="s.logo" alt="" loading="lazy" draggable="false" referrerpolicy="no-referrer" @error="onLogoError" />
           </span>{{ s.name }}
         </span>
       </div>
@@ -273,6 +282,42 @@ export default defineComponent({
       if (img) img.style.display = "none";
     };
 
+    // Click-drag to scrub the marquee (touch scrolls natively, so only handle mouse/pen here).
+    const tickerEl = ref<HTMLElement | null>(null);
+    let tickDragging = false;
+    let tickStartX = 0;
+    let tickStartScroll = 0;
+
+    const onTickDown = (e: PointerEvent) => {
+      const el = tickerEl.value;
+      if (!el || e.pointerType === "touch") return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      tickDragging = true;
+      tickStartX = e.clientX;
+      tickStartScroll = el.scrollLeft;
+      el.classList.add("is-drag");
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* pointer capture unsupported, drag still works */
+      }
+    };
+    const onTickMove = (e: PointerEvent) => {
+      const el = tickerEl.value;
+      if (!el || !tickDragging) return;
+      el.scrollLeft = tickStartScroll - (e.clientX - tickStartX);
+      // Wrap around the loop seam invisibly (halves are identical).
+      const half = el.scrollWidth / 2;
+      if (half > 0 && el.scrollLeft >= half) {
+        el.scrollLeft -= half;
+        tickStartScroll -= half;
+      }
+    };
+    const onTickUp = () => {
+      tickDragging = false;
+      tickerEl.value?.classList.remove("is-drag");
+    };
+
     return {
       currentText,
       heroEl,
@@ -282,6 +327,10 @@ export default defineComponent({
       featured: [projects[2], projects[1]],
       tickerTwice: [...skills, ...skills],
       onLogoError,
+      tickerEl,
+      onTickDown,
+      onTickMove,
+      onTickUp,
       location: profile.location,
       availability: profile.availability,
       email: profile.email,
@@ -397,11 +446,18 @@ export default defineComponent({
   background: transparent;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
   padding: 0.85rem 0;
   mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
 }
+.ticker::-webkit-scrollbar { display: none; }
+.ticker.is-drag { cursor: grabbing; }
 .ticker-track {
   display: inline-flex;
   align-items: center;
@@ -410,7 +466,7 @@ export default defineComponent({
   animation: tick 48s linear infinite;
   will-change: transform;
 }
-.ticker:hover .ticker-track { animation-play-state: paused; }
+.ticker.is-drag .ticker-track { animation-play-state: paused; }
 .tick {
   display: inline-flex;
   align-items: center;
@@ -439,6 +495,7 @@ export default defineComponent({
   object-fit: contain;
   filter: grayscale(1);
   opacity: 0.75;
+  pointer-events: none;
   transition: filter var(--dur-fast) ease, opacity var(--dur-fast) ease;
 }
 .ticker:hover .tick-logo img { filter: none; opacity: 1; }
