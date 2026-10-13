@@ -13,7 +13,7 @@
             <span class="line line--accent">Tupil<span class="dot">.</span></span>
           </h1>
           <p class="hero-role" v-reveal="{ delay: 160 }" aria-live="polite">
-            <span class="role-static">I build</span>
+            <span class="role-static">I'm a</span>
             <span class="role-typed">{{ currentText }}</span><span class="caret" aria-hidden="true">▍</span>
           </p>
           <p class="lead hero-lede" v-reveal="{ delay: 220 }">
