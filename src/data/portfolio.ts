@@ -54,7 +54,7 @@ export const roles: string[] = [
   "Full Stack Developer",
   "Vue.js Specialist",
   "Node.js Developer",
-  "API Builder",
+  "Backend Developer",
 ];
 
 export const projects: Project[] = [
