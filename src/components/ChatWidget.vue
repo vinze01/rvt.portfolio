@@ -25,9 +25,11 @@
       ></iframe>
     </div>
     <button
+      ref="fabEl"
       class="chat-fab"
       type="button"
-      @click="open = !open"
+      @click="toggleChat"
+      v-magnetic="{ strength: 0.3 }"
       :aria-expanded="open ? 'true' : 'false'"
       :aria-label="open ? 'Close assistant chat' : 'Open assistant chat'"
     >
@@ -38,15 +40,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import anime from "animejs";
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons-vue";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "ChatWidget",
   components: { MessageOutlined, CloseOutlined },
-  setup() {
+  setup: () => {
     const open = ref(false);
-    return { open };
+    const fabEl = ref<HTMLElement | null>(null);
+
+    const toggleChat = () => {
+      open.value = !open.value;
+      if (!prefersReducedMotion() && fabEl.value) {
+        anime.remove(fabEl.value);
+        anime({
+          targets: fabEl.value,
+          scale: [0.82, 1],
+          rotate: [open.value ? -22 : 22, 0],
+          duration: 580,
+          easing: "easeOutElastic(1, .5)",
+        });
+      }
+    };
+
+    onMounted(() => {
+      if (!prefersReducedMotion() && fabEl.value) {
+        anime({
+          targets: fabEl.value,
+          scale: [0, 1],
+          opacity: [0, 1],
+          delay: 650,
+          duration: 750,
+          easing: "easeOutElastic(1, .6)",
+        });
+      }
+    });
+
+    return { open, fabEl, toggleChat };
   },
 });
 </script>

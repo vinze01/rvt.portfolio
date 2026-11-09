@@ -28,7 +28,7 @@
             <p class="meta-row">Availability</p>
             <p class="info-val ok">● {{ availability }}</p>
           </div>
-          <div class="info-row" v-reveal>
+          <div class="info-row" v-reveal="{ stagger: 65, selector: '.meta-row, .social-btn' }">
             <p class="meta-row">Elsewhere</p>
             <div class="social-row">
               <a
@@ -38,6 +38,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="social-btn"
+                v-magnetic="{ strength: 0.25 }"
               >{{ s.label }} ↗</a>
             </div>
           </div>
@@ -47,25 +48,30 @@
           </p>
         </div>
 
-        <form class="form" @submit.prevent="sendEmail" v-reveal aria-label="Contact form">
+        <form
+          class="form"
+          @submit.prevent="sendEmail"
+          v-reveal="{ stagger: 65, selector: 'h2, .field, .submit, .form-hint' }"
+          aria-label="Contact form"
+        >
           <h2>Send a message</h2>
-          <div class="field">
+          <div class="field" @focusin="onFieldFocus" @focusout="onFieldBlur">
             <label for="c-name">Name</label>
             <input id="c-name" v-model="form.name" type="text" placeholder="Your name" required autocomplete="name" />
           </div>
-          <div class="field">
+          <div class="field" @focusin="onFieldFocus" @focusout="onFieldBlur">
             <label for="c-email">Email</label>
             <input id="c-email" v-model="form.email" type="email" placeholder="your.email@example.com" required autocomplete="email" />
           </div>
-          <div class="field">
+          <div class="field" @focusin="onFieldFocus" @focusout="onFieldBlur">
             <label for="c-subject">Subject</label>
             <input id="c-subject" v-model="form.subject" type="text" placeholder="What's this about?" required />
           </div>
-          <div class="field">
+          <div class="field" @focusin="onFieldFocus" @focusout="onFieldBlur">
             <label for="c-message">Message</label>
             <textarea id="c-message" v-model="form.message" placeholder="Tell me about your project, timeline, and goals…" rows="6" required></textarea>
           </div>
-          <button class="btn-craft btn-craft--accent submit" type="submit">
+          <button class="btn-craft btn-craft--accent submit" type="submit" v-magnetic="{ strength: 0.16 }">
             Compose email <span aria-hidden="true">→</span>
           </button>
           <p class="form-hint">Opens your email client addressed to {{ emailTo }}.</p>
@@ -80,7 +86,7 @@
       @cancel="showSuccess = false"
     >
       <div class="success">
-        <p class="success-mark" aria-hidden="true">✓</p>
+        <p ref="successMarkEl" class="success-mark" aria-hidden="true">✓</p>
         <p>Your mail app should now be open with the message pre-filled. I'll reply as soon as I can. Thank you for reaching out.</p>
       </div>
     </a-modal>
@@ -88,36 +94,91 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, nextTick } from "vue";
+import anime from "animejs";
 import { profile } from "@/data/portfolio";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "Contact",
   props: { isDark: { type: Boolean, default: false } },
-  data() {
-    return {
-      form: { name: "", email: "", subject: "", message: "" },
-      showSuccess: false,
+  setup: () => {
+    const form = ref({ name: "", email: "", subject: "", message: "" });
+    const showSuccess = ref(false);
+    const successMarkEl = ref<HTMLElement | null>(null);
+
+    const onFieldFocus = (e: FocusEvent) => {
+      if (prefersReducedMotion()) return;
+      const field = e.currentTarget as HTMLElement | null;
+      const label = field?.querySelector("label");
+      if (label) {
+        anime.remove(label);
+        anime({
+          targets: label,
+          translateX: 6,
+          duration: 280,
+          easing: "easeOutQuad",
+        });
+      }
     };
-  },
-  computed: {
-    email(): string { return profile.email; },
-    emailTo(): string { return profile.emailTo; },
-    location(): string { return profile.location; },
-    availability(): string { return profile.availability; },
-    socials() { return profile.socials; },
-  },
-  methods: {
-    sendEmail() {
+
+    const onFieldBlur = (e: FocusEvent) => {
+      if (prefersReducedMotion()) return;
+      const field = e.currentTarget as HTMLElement | null;
+      const label = field?.querySelector("label");
+      if (label) {
+        anime.remove(label);
+        anime({
+          targets: label,
+          translateX: 0,
+          duration: 420,
+          easing: "easeOutElastic(1, .6)",
+        });
+      }
+    };
+
+    const sendEmail = () => {
       // Preserved behavior: no backend, compose via mailto, then confirm.
-      const subject = encodeURIComponent(this.form.subject);
+      const subject = encodeURIComponent(form.value.subject);
       const body = encodeURIComponent(
-        `Name: ${this.form.name}\nEmail: ${this.form.email}\n\nMessage:\n${this.form.message}`
+        `Name: ${form.value.name}\nEmail: ${form.value.email}\n\nMessage:\n${form.value.message}`
       );
       window.location.href = `mailto:${profile.emailTo}?subject=${subject}&body=${body}`;
-      this.showSuccess = true;
-      this.form = { name: "", email: "", subject: "", message: "" };
-    },
+      showSuccess.value = true;
+      form.value = { name: "", email: "", subject: "", message: "" };
+
+      if (!prefersReducedMotion()) {
+        nextTick(() => {
+          window.setTimeout(() => {
+            const mark = successMarkEl.value;
+            if (mark) {
+              anime.remove(mark);
+              anime({
+                targets: mark,
+                scale: [0, 1],
+                rotate: [-45, 0],
+                duration: 750,
+                easing: "easeOutElastic(1, .5)",
+              });
+            }
+          }, 50);
+        });
+      }
+    };
+
+    return {
+      form,
+      showSuccess,
+      successMarkEl,
+      email: profile.email,
+      emailTo: profile.emailTo,
+      location: profile.location,
+      availability: profile.availability,
+      socials: profile.socials,
+      onFieldFocus,
+      onFieldBlur,
+      sendEmail,
+    };
   },
 });
 </script>
