@@ -10,8 +10,8 @@
             I build web applications from the ground up, from the database and APIs
             behind them to the interfaces people actually use.
           </p>
-          <dl class="facts" v-reveal="{ delay: 200 }">
-            <div><dt>Experience</dt><dd>4+ years · full-stack engineer</dd></div>
+          <dl class="facts" v-reveal="{ delay: 200, stagger: 80, selector: 'div' }">
+            <div><dt>Experience</dt><dd>{{ yearsCount }}+ years · full-stack engineer</dd></div>
             <div><dt>Domains</dt><dd>Enterprise apps · portals · web platforms</dd></div>
             <div><dt>Now</dt><dd>Open to opportunities</dd></div>
           </dl>
@@ -21,7 +21,7 @@
 
     <section class="section--tight">
       <div class="wrap split">
-        <figure class="portrait" v-reveal>
+        <figure class="portrait" v-reveal v-tilt="{ max: 4.5, scale: 1.015 }">
           <img src="@/assets/profile2.jpg" alt="Robin Vince Tupil portrait" />
         </figure>
         <div class="narrative">
@@ -29,11 +29,11 @@
           <p v-reveal>I'm a dedicated software developer with a passion for building innovative solutions. With expertise in modern web technologies, I specialize in creating responsive, user-friendly applications that solve real-world problems.</p>
           <p v-reveal>Throughout my career, I've worked on diverse projects including HRIS, LMS, DMS, and various web applications. I pride myself on writing production-ready code, designing efficient APIs, and creating seamless integrations between front-end and back-end systems.</p>
           <p v-reveal>I actively explore AI and emerging technologies, continuously learning and integrating new tools and approaches into my development workflow.</p>
-          <ul class="creed" v-reveal>
-            <li><strong>Production-ready code</strong><span>Clean, reviewed, maintainable.</span></li>
-            <li><strong>API design &amp; integration</strong><span>Contracts front and back both honor.</span></li>
-            <li><strong>Version control</strong><span>Deployments without drama.</span></li>
-            <li><strong>AI &amp; emerging tech</strong><span>Leverage, not shortcuts.</span></li>
+          <ul class="creed" v-reveal="{ stagger: 75, selector: 'li' }">
+            <li @pointerenter="onCreedEnter" @pointerleave="onCreedLeave"><strong>Production-ready code</strong><span>Clean, reviewed, maintainable.</span></li>
+            <li @pointerenter="onCreedEnter" @pointerleave="onCreedLeave"><strong>API design &amp; integration</strong><span>Contracts front and back both honor.</span></li>
+            <li @pointerenter="onCreedEnter" @pointerleave="onCreedLeave"><strong>Version control</strong><span>Deployments without drama.</span></li>
+            <li @pointerenter="onCreedEnter" @pointerleave="onCreedLeave"><strong>AI &amp; emerging tech</strong><span>Leverage, not shortcuts.</span></li>
           </ul>
         </div>
       </div>
@@ -104,8 +104,12 @@
         <SectionHeading index="B" kicker="Capabilities">
           Organized by what I deliver<span class="accent-word">.</span>
         </SectionHeading>
-        <div class="cap-grid">
-          <article v-for="g in capabilityGroups" :key="g.index" class="cap-card" v-reveal>
+        <div class="cap-grid" v-reveal="{ stagger: 85, selector: '.cap-card' }">
+          <article
+            v-for="g in capabilityGroups"
+            :key="g.index"
+            class="cap-card"
+          >
             <h3>{{ g.title }}</h3>
             <p class="cap-body">{{ g.body }}</p>
             <ul>
@@ -119,8 +123,8 @@
     <section class="section--tight edu">
       <div class="wrap">
         <SectionHeading index="C" kicker="Education">Foundations<span class="accent-word">.</span></SectionHeading>
-        <ol class="edu-list">
-          <li v-for="e in education" :key="e.school" v-reveal>
+        <ol class="edu-list" v-reveal="{ stagger: 90, selector: 'li' }">
+          <li v-for="e in education" :key="e.school">
             <div><h3>{{ e.school }}</h3><p class="edu-degree">{{ e.degree }}</p></div>
             <div class="edu-meta"><span>{{ e.period }}</span><span>{{ e.location }}</span></div>
           </li>
@@ -131,20 +135,133 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted, nextTick } from "vue";
+import anime from "animejs";
 import SectionHeading from "@/components/SectionHeading.vue";
 import { experiences, capabilityGroups, education } from "@/data/portfolio";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "About",
   components: { SectionHeading },
   props: { isDark: { type: Boolean, default: false } },
-  setup() {
+  setup: () => {
     const openIndex = ref(0);
-    const toggle = (i: number) => {
-      openIndex.value = openIndex.value === i ? -1 : i;
+    const yearsCount = ref(4);
+    const reduced = prefersReducedMotion();
+
+    const animateTimelineBody = (index: number) => {
+      if (reduced || index < 0) return;
+      nextTick(() => {
+        const container = document.getElementById(`exp-body-${index}`);
+        if (!container) return;
+        const points = Array.from(container.querySelectorAll<HTMLElement>("ul li"));
+        const tags = Array.from(container.querySelectorAll<HTMLElement>(".tag-row span"));
+
+        if (points.length) {
+          anime.remove(points);
+          anime({
+            targets: points,
+            opacity: [0, 1],
+            translateX: [-12, 0],
+            duration: 420,
+            delay: anime.stagger(35, { start: 40 }),
+            easing: "easeOutQuart",
+            complete: () => {
+              points.forEach((p) => {
+                p.style.opacity = "";
+                p.style.transform = "";
+              });
+            },
+          });
+        }
+
+        if (tags.length) {
+          anime.remove(tags);
+          anime({
+            targets: tags,
+            opacity: [0, 1],
+            translateY: [8, 0],
+            duration: 380,
+            delay: anime.stagger(30, { start: 120 }),
+            easing: "easeOutQuart",
+            complete: () => {
+              tags.forEach((t) => {
+                t.style.opacity = "";
+                t.style.transform = "";
+              });
+            },
+          });
+        }
+      });
     };
-    return { experiences, capabilityGroups, education, openIndex, toggle };
+
+    const toggle = (i: number) => {
+      const next = openIndex.value === i ? -1 : i;
+      openIndex.value = next;
+      if (next >= 0) {
+        animateTimelineBody(next);
+      }
+    };
+
+    const onCreedEnter = (e: PointerEvent) => {
+      if (reduced) return;
+      const el = e.currentTarget as HTMLElement | null;
+      const strong = el?.querySelector("strong");
+      if (strong) {
+        anime.remove(strong);
+        anime({
+          targets: strong,
+          translateX: 8,
+          duration: 320,
+          easing: "easeOutQuad",
+        });
+      }
+    };
+
+    const onCreedLeave = (e: PointerEvent) => {
+      if (reduced) return;
+      const el = e.currentTarget as HTMLElement | null;
+      const strong = el?.querySelector("strong");
+      if (strong) {
+        anime.remove(strong);
+        anime({
+          targets: strong,
+          translateX: 0,
+          duration: 500,
+          easing: "easeOutElastic(1, .6)",
+        });
+      }
+    };
+
+    onMounted(() => {
+      if (!reduced) {
+        yearsCount.value = 0;
+        const counterObj = { val: 0 };
+        anime({
+          targets: counterObj,
+          val: 4,
+          round: 1,
+          delay: 180,
+          duration: 900,
+          easing: "easeOutQuart",
+          update: () => {
+            yearsCount.value = counterObj.val;
+          },
+        });
+      }
+    });
+
+    return {
+      experiences,
+      capabilityGroups,
+      education,
+      openIndex,
+      yearsCount,
+      toggle,
+      onCreedEnter,
+      onCreedLeave,
+    };
   },
 });
 </script>

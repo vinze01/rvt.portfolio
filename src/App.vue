@@ -3,7 +3,13 @@
     <SiteHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
     <a-layout-content id="main" class="main">
       <router-view v-slot="{ Component, route }">
-        <transition name="route" mode="out-in">
+        <transition
+          name="route"
+          mode="out-in"
+          :css="false"
+          @enter="onRouteEnter"
+          @leave="onRouteLeave"
+        >
           <component :is="Component" :key="route.path" :is-dark="isDark" />
         </transition>
       </router-view>
@@ -16,17 +22,54 @@
 <script lang="ts">
 import { defineComponent, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import anime from "animejs";
 import SiteHeader from "@/components/SiteHeader.vue";
 import SiteFooter from "@/components/SiteFooter.vue";
 import ChatWidget from "@/components/ChatWidget.vue";
 import { useTheme, initTheme } from "@/composables/useTheme";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "App",
   components: { SiteHeader, SiteFooter, ChatWidget },
-  setup() {
+  setup: () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
+
+    const onRouteEnter = (el: Element, done: () => void) => {
+      if (prefersReducedMotion()) {
+        done();
+        return;
+      }
+      // Avoid applying transform on the full-page container so child anime.js reveals
+      // composite directly on the root viewport without a giant offscreen surface.
+      anime.remove(el);
+      anime({
+        targets: el,
+        opacity: [0, 1],
+        duration: 200,
+        easing: "linear",
+        complete: () => {
+          (el as HTMLElement).style.opacity = "";
+          done();
+        },
+      });
+    };
+
+    const onRouteLeave = (el: Element, done: () => void) => {
+      if (prefersReducedMotion()) {
+        done();
+        return;
+      }
+      anime.remove(el);
+      anime({
+        targets: el,
+        opacity: [1, 0],
+        duration: 140,
+        easing: "linear",
+        complete: done,
+      });
+    };
 
     onMounted(() => {
       initTheme();
@@ -36,7 +79,7 @@ export default defineComponent({
       });
     });
 
-    return { isDark, toggleTheme };
+    return { isDark, toggleTheme, onRouteEnter, onRouteLeave };
   },
 });
 </script>

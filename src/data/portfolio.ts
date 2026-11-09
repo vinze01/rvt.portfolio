@@ -10,6 +10,7 @@ export interface Project {
   category: string;
   year: string;
   image: string;
+  images?: string[];
   description: string;
   longDescription: string;
   features: string[];
@@ -40,8 +41,7 @@ export const profile = {
   role: "Full Stack Developer",
   location: "Las Piñas City, Philippines",
   email: "robin.vince01@gmail.com",
-  // NOTE: Contact form composes a mailto to this address (existing behavior preserved).
-  emailTo: "robinvincetupil@gmail.com",
+  emailTo: "robin.vince01@gmail.com",
   availability: "Open for opportunities",
   socials: [
     { label: "GitHub", url: "https://github.com/vinze01" },
@@ -65,7 +65,7 @@ export const projects: Project[] = [
     category: "Bike rental platform · Capstone",
     year: "Capstone",
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    image: require("@/assets/bike-rental.png"),
+    image: require("@/assets/padyak-tayo/bike-rental.png"),
     description:
       "A modern bike rental and sharing service connecting bike owners with renters across the Philippines.",
     longDescription:
@@ -87,7 +87,7 @@ export const projects: Project[] = [
     category: "Clinic operations · Scheduling",
     year: "Full stack",
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    image: require("@/assets/dental-services.png"),
+    image: require("@/assets/dental-clinic/dental-services.png"),
     description:
       "A comprehensive solution for dental clinics to automate appointment management and patient records.",
     longDescription:
@@ -107,9 +107,9 @@ export const projects: Project[] = [
     index: "03",
     title: "Personal Finance Tracker",
     category: "Personal finance · Full stack + analytics",
-    year: "Ongoing",
+    year: "Live demo",
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    image: require("@/assets/ft-dashboard.png"),
+    image: require("@/assets/finance-tracker/ft-dashboard.png"),
     description:
       "A full-stack finance suite for tracking income and expenses across monthly, bi-monthly, and yearly periods, with budgets, accounts, bills, savings goals, and analytics.",
     longDescription:
@@ -139,8 +139,8 @@ export const projects: Project[] = [
       "JWT",
       "Cloudinary",
     ],
-    github: ["https://github.com/vinze01/ft-client", "https://github.com/vinze01/ft-server"],
-    ongoing: true,
+    website: ["https://finance-tracker.rvt-app.workers.dev/"],
+    github: ["https://github.com/vinze01/Finance-Tracker"],
   },
   {
     id: 4,
@@ -149,7 +149,7 @@ export const projects: Project[] = [
     category: "Productivity · Quests, alarms + auth",
     year: "Live demo",
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    image: require("@/assets/task-management.png"),
+    image: require("@/assets/task-management/task-management.png"),
     description:
       "A playful quest-board SPA with priorities, self-set alarms, pagination, password-free sign-in, and dark mode. No backend required.",
     longDescription:
@@ -165,6 +165,53 @@ export const projects: Project[] = [
     technologies: ["Vue 3", "TypeScript", "Vite", "Pinia", "Vue Router"],
     website: ["https://rvt-task-management.netlify.app/"],
     github: ["https://github.com/vinze01/task-management"],
+  },
+  {
+    id: 5,
+    index: "05",
+    title: "JSON Studio",
+    category: "Chrome extension · Developer utility",
+    year: "Chrome MV3",
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    image: require("@/assets/json-studio/0.png"),
+    images: [
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/0.png"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/1.png"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/2.png"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/3.png"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/4.png"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/json-studio/5.png"),
+    ],
+    description:
+      "A modern, privacy-first JSON formatter, viewer, validator, and developer utility built as a Manifest V3 Chrome Extension — all processing stays 100% local.",
+    longDescription:
+      "JSON Studio is a privacy-first Chrome Extension (Manifest V3) built with Vue 3, TypeScript, WXT, Tailwind CSS v4, and CodeMirror 6. Designed as a full-page developer workspace with zero network calls and zero telemetry, its flagship Integrity Report catches structural issues other formatters silently hide: duplicate property names, duplicate array elements, and IEEE-754 precision-risk numbers (>15 digits such as Snowflake IDs). It pairs diagnostics with a lossless token-verbatim reprinter, structure-aware Auto-Repair, in-editor error highlighting, and a virtualized tree viewer.",
+    features: [
+      "Integrity Report: Flags duplicate keys, duplicate array elements, and >15-digit precision-risk numbers with RFC 6901 JSON Pointers",
+      "Lossless Formatting & Minifying: Token-verbatim reprinter preserves 19-digit Snowflake IDs, number spellings, escapes, and key order",
+      "Smart Validation & Auto-Repair: Structure-aware scanner highlights exact error ranges and repairs trailing/missing commas, missing colons, comments, and quotes",
+      "Virtualized Tree & CodeMirror 6 Views: Handles large documents smoothly with a 50,000-node guard, keyboard navigation, and syntax highlighting",
+      "Search, Copy & File I/O: Key/value search with auto-reveal, subtree/pointer copy utilities, and drag-and-drop JSON import/export",
+      "User-Initiated Page Inspection: Captures active tab JSON or JSONP payloads into a workspace tab with minimal permissions and zero background tracking",
+    ],
+    technologies: [
+      "Vue 3",
+      "TypeScript",
+      "WXT",
+      "Chrome MV3",
+      "Tailwind CSS",
+      "CodeMirror 6",
+      "Pinia",
+      "Vitest",
+      "Playwright",
+    ],
+    github: ["https://github.com/vinze01/JSON-Studio"],
   },
 ];
 

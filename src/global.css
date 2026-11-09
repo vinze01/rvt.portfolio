@@ -109,18 +109,17 @@ button, input, textarea { font-family: inherit; }
 ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 
-/* ---------- scroll reveal ---------- */
+/* ---------- scroll reveal (anime.js driven) ---------- */
 .rv {
   opacity: 0;
   transform: translateY(var(--rv-y, 26px));
   transition:
     opacity var(--dur-slow) var(--ease-out) var(--rv-d, 0ms),
     transform var(--dur-slow) var(--ease-out) var(--rv-d, 0ms);
-  will-change: opacity, transform;
 }
 .rv.is-revealed { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .rv { opacity: 1; transform: none; transition: none; }
+  .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
 

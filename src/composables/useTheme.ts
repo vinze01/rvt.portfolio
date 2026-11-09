@@ -9,7 +9,7 @@ const STORAGE_KEY = "theme";
 const isDark = ref(false);
 let initialized = false;
 
-function applyTheme(dark: boolean) {
+const applyTheme = (dark: boolean): void => {
   isDark.value = dark;
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   document.documentElement.style.colorScheme = dark ? "dark" : "light";
@@ -18,9 +18,9 @@ function applyTheme(dark: boolean) {
   } catch {
     /* storage unavailable, keep in-memory only */
   }
-}
+};
 
-export function initTheme(): void {
+export const initTheme = (): void => {
   if (initialized) return;
   initialized = true;
   let dark = false;
@@ -35,13 +35,13 @@ export function initTheme(): void {
     dark = false;
   }
   applyTheme(dark);
-}
+};
 
-export function toggleTheme(): void {
+export const toggleTheme = (): void => {
   applyTheme(!isDark.value);
-}
+};
 
-export function useTheme() {
+export const useTheme = () => {
   initTheme();
   return { isDark, initTheme, toggleTheme };
-}
+};

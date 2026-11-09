@@ -7,43 +7,47 @@
 
       <div class="wrap-wide hero-inner">
         <div class="hero-main">
-          <p class="kicker" v-reveal>Portfolio · Full Stack Developer</p>
-          <h1 class="display h-display hero-name" v-reveal="{ delay: 80 }">
-            <span class="line">Robin Vince</span>
-            <span class="line line--accent">Tupil<span class="dot">.</span></span>
+          <p class="kicker hero-anim-kicker">Portfolio · Full Stack Developer</p>
+          <h1 class="display h-display hero-name">
+            <span class="line">
+              <span class="hero-word">Robin</span>&nbsp;<span class="hero-word">Vince</span>
+            </span>
+            <span class="line line--accent">
+              <span class="hero-word">Tupil</span><span class="dot hero-dot">.</span>
+            </span>
           </h1>
-          <p class="hero-role" v-reveal="{ delay: 160 }" aria-live="polite">
+          <p class="hero-role hero-anim-item" aria-live="polite">
             <span class="role-static">I'm a</span>
             <span class="role-typed">{{ currentText }}</span><span class="caret" aria-hidden="true">▍</span>
           </p>
-          <p class="lead hero-lede" v-reveal="{ delay: 220 }">
+          <p class="lead hero-lede hero-anim-item">
             Full stack developer working across Vue, TypeScript, Node.js and REST APIs,
             from component systems to the services behind them. Based in the Philippines,
             shipping production web apps that solve real-world problems.
           </p>
-          <div class="hero-ctas" v-reveal="{ delay: 300 }">
-            <router-link to="/projects" class="btn-craft btn-craft--accent">
+          <div class="hero-ctas">
+            <router-link to="/projects" class="btn-craft btn-craft--accent hero-cta-btn" v-magnetic>
               View selected work <span aria-hidden="true">→</span>
             </router-link>
-            <router-link to="/contact" class="btn-craft btn-craft--ghost">
+            <router-link to="/contact" class="btn-craft btn-craft--ghost hero-cta-btn" v-magnetic>
               Get in touch
             </router-link>
           </div>
-          <dl class="hero-meta" v-reveal="{ delay: 360 }">
-            <div><dt>Location</dt><dd>{{ location }}</dd></div>
-            <div><dt>Focus</dt><dd>Frontend · APIs · Delivery</dd></div>
-            <div><dt>Status</dt><dd class="ok">● {{ availability }}</dd></div>
+          <dl class="hero-meta">
+            <div class="hero-meta-item"><dt>Location</dt><dd>{{ location }}</dd></div>
+            <div class="hero-meta-item"><dt>Focus</dt><dd>Frontend · APIs · Delivery</dd></div>
+            <div class="hero-meta-item"><dt>Status</dt><dd class="ok">● {{ availability }}</dd></div>
           </dl>
         </div>
 
-        <figure class="hero-figure" v-reveal="{ delay: 200 }">
-          <div class="fig-frame">
+        <figure class="hero-figure">
+          <div class="fig-frame" v-tilt="{ max: 2.5 }">
             <img src="@/assets/profile.jpg" alt="Portrait of Robin Vince Tupil" />
             <figcaption class="fig-cap">
               <span>Robin Vince Tupil</span><span>{{ location }}</span>
             </figcaption>
           </div>
-          <div class="fig-stamp" aria-hidden="true">Full&nbsp;Stack<br />Engineer</div>
+          <div ref="stampEl" class="fig-stamp" aria-hidden="true">Full&nbsp;Stack<br />Engineer</div>
         </figure>
       </div>
 
@@ -65,7 +69,11 @@
       @pointercancel="onTickUp"
     >
       <div class="ticker-track">
-        <span v-for="(s, idx) in tickerTwice" :key="s.name + idx" class="tick">
+        <span
+          v-for="(s, idx) in tickerTwice"
+          :key="s.name + idx"
+          class="tick"
+        >
           <span class="tick-logo">
             <img :src="s.logo" alt="" loading="lazy" draggable="false" referrerpolicy="no-referrer" @error="onLogoError" />
           </span>{{ s.name }}
@@ -86,7 +94,7 @@
           :key="p.id"
           class="feat"
           :class="{ 'feat--flip': i % 2 === 1 }"
-          v-reveal
+          v-reveal="{ stagger: 85, selector: '.feat-img, .feat-body' }"
         >
           <router-link :to="{ path: '/projects', query: { open: p.id } }" class="feat-img" :aria-label="`Open ${p.title} details`">
             <img :src="p.image" :alt="`${p.title} screenshot`" loading="lazy" />
@@ -120,7 +128,7 @@
         </article>
 
         <div class="center" v-reveal>
-          <router-link to="/projects" class="btn-craft btn-craft--ghost">All projects ({{ projects.length }}) →</router-link>
+          <router-link to="/projects" class="btn-craft btn-craft--ghost" v-magnetic>All projects ({{ projects.length }}) →</router-link>
         </div>
       </div>
     </section>
@@ -134,7 +142,14 @@
           Engineering, end to end<span class="accent-word">.</span>
         </SectionHeading>
         <div class="cap-list">
-          <div v-for="c in capabilities" :key="c.index" class="cap-row" v-reveal>
+          <div
+            v-for="c in capabilities"
+            :key="c.index"
+            class="cap-row"
+            v-reveal="{ stagger: 65, selector: '.cap-index, .cap-main, .cap-items' }"
+            @pointerenter="onCapEnter"
+            @pointerleave="onCapLeave"
+          >
             <span class="cap-index">{{ c.index }}</span>
             <div class="cap-main">
               <h3>{{ c.title }}</h3>
@@ -153,10 +168,10 @@
           <SectionHeading index="03" kicker="Experience">
             Three roles, one trajectory<span class="accent-word">.</span>
           </SectionHeading>
-          <router-link to="/about" class="btn-craft btn-craft--ghost">Full story on About →</router-link>
+          <router-link to="/about" class="btn-craft btn-craft--ghost" v-magnetic>Full story on About →</router-link>
         </div>
-        <ol class="snap-list">
-          <li v-for="e in experiences" :key="e.title + e.period" v-reveal>
+        <ol class="snap-list" v-reveal="{ stagger: 95, selector: 'li' }">
+          <li v-for="e in experiences" :key="e.title + e.period">
             <p class="meta-row">{{ e.period }}</p>
             <h3>{{ e.title }}</h3>
             <p class="snap-co">{{ e.company }}</p>
@@ -167,12 +182,12 @@
 
     <!-- ============ CONTACT CTA ============ -->
     <section class="section" aria-label="Contact call to action">
-      <div class="wrap cta-band" v-reveal>
+      <div class="wrap cta-band" v-reveal="{ stagger: 80, selector: '.kicker, .cta-title, .cta-row .btn-craft' }">
         <p class="kicker kicker--plain">04 · Contact</p>
         <h2 class="display cta-title">Have something worth building? <em>Let's talk.</em></h2>
         <div class="cta-row">
-          <router-link to="/contact" class="btn-craft btn-craft--accent">Start a conversation →</router-link>
-          <a class="btn-craft btn-craft--ghost" :href="`mailto:${email}`">{{ email }}</a>
+          <router-link to="/contact" class="btn-craft btn-craft--accent" v-magnetic>Start a conversation →</router-link>
+          <a class="btn-craft btn-craft--ghost" :href="`mailto:${email}`" v-magnetic>{{ email }}</a>
         </div>
       </div>
     </section>
@@ -181,8 +196,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
+import anime from "animejs";
 import SectionHeading from "@/components/SectionHeading.vue";
 import { projects, experiences, capabilityGroups, roles, profile } from "@/data/portfolio";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "Home",
@@ -190,9 +207,10 @@ export default defineComponent({
   props: {
     isDark: { type: Boolean, default: false },
   },
-  setup() {
+  setup: () => {
     const currentText = ref("");
     const heroEl = ref<HTMLElement | null>(null);
+    const stampEl = ref<HTMLElement | null>(null);
     let timer: number | null = null;
     let roleIdx = 0;
     let charIdx = 0;
@@ -201,10 +219,7 @@ export default defineComponent({
     let spotX = 50;
     let spotY = 30;
 
-    const reduced =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = prefersReducedMotion();
 
     const typeEffect = () => {
       const role = roles[roleIdx];
@@ -243,16 +258,172 @@ export default defineComponent({
       if (!raf) raf = requestAnimationFrame(paintSpot);
     };
 
+    const onCapEnter = (e: PointerEvent) => {
+      if (reduced) return;
+      const row = e.currentTarget as HTMLElement | null;
+      const badge = row?.querySelector<HTMLElement>(".cap-index");
+      if (badge) {
+        anime.remove(badge);
+        badge.style.transition = "none";
+        anime({
+          targets: badge,
+          scale: 1.08,
+          rotate: -5,
+          duration: 320,
+          easing: "easeOutQuart",
+        });
+      }
+    };
+
+    const onCapLeave = (e: PointerEvent) => {
+      if (reduced) return;
+      const row = e.currentTarget as HTMLElement | null;
+      const badge = row?.querySelector<HTMLElement>(".cap-index");
+      if (badge) {
+        anime.remove(badge);
+        anime({
+          targets: badge,
+          scale: 1,
+          rotate: 0,
+          duration: 360,
+          easing: "easeOutQuart",
+          complete: () => {
+            badge.style.transform = "";
+            badge.style.transition = "";
+          },
+        });
+      }
+    };
+
     onMounted(() => {
       currentText.value = reduced ? roles[0] : "";
       if (!reduced) typeEffect();
-      window.addEventListener("pointermove", onPointer, { passive: true });
+      heroEl.value?.addEventListener("pointermove", onPointer, { passive: true });
+
+      if (!reduced && heroEl.value) {
+        const root = heroEl.value;
+        const kicker = root.querySelector<HTMLElement>(".hero-anim-kicker");
+        const words = Array.from(root.querySelectorAll<HTMLElement>(".hero-word, .hero-dot"));
+        const items = Array.from(root.querySelectorAll<HTMLElement>(".hero-anim-item"));
+        const ctas = Array.from(root.querySelectorAll<HTMLElement>(".hero-cta-btn"));
+        const metas = Array.from(root.querySelectorAll<HTMLElement>(".hero-meta-item"));
+        const fig = root.querySelector<HTMLElement>(".fig-frame");
+
+        const allTargets = [
+          ...(kicker ? [kicker] : []),
+          ...words,
+          ...items,
+          ...ctas,
+          ...metas,
+          ...(fig ? [fig] : []),
+        ];
+
+        allTargets.forEach((el) => {
+          el.style.transition = "none";
+          el.style.willChange = "opacity, transform";
+        });
+        anime.set(allTargets, { opacity: 0, translateY: 16 });
+
+        if (stampEl.value) {
+          stampEl.value.style.transition = "none";
+          anime.set(stampEl.value, { opacity: 0, scale: 0.85, rotate: 12 });
+        }
+
+        requestAnimationFrame(() => {
+          anime
+            .timeline({
+              easing: "easeOutCubic",
+              complete: () => {
+                allTargets.forEach((el) => {
+                  el.style.opacity = "";
+                  el.style.transform = "";
+                  el.style.transition = "";
+                  el.style.willChange = "";
+                });
+              },
+            })
+            .add({
+              targets: kicker,
+              opacity: [0, 1],
+              translateY: [16, 0],
+              duration: 460,
+            })
+            .add(
+              {
+                targets: words,
+                opacity: [0, 1],
+                translateY: [16, 0],
+                duration: 520,
+                delay: anime.stagger(55),
+              },
+              "-=380"
+            )
+            .add(
+              {
+                targets: fig,
+                opacity: [0, 1],
+                translateY: [18, 0],
+                duration: 560,
+              },
+              "-=460"
+            )
+            .add(
+              {
+                targets: items,
+                opacity: [0, 1],
+                translateY: [14, 0],
+                duration: 480,
+                delay: anime.stagger(55),
+              },
+              "-=440"
+            )
+            .add(
+              {
+                targets: ctas,
+                opacity: [0, 1],
+                translateY: [14, 0],
+                duration: 460,
+                delay: anime.stagger(55),
+              },
+              "-=380"
+            )
+            .add(
+              {
+                targets: metas,
+                opacity: [0, 1],
+                translateY: [12, 0],
+                duration: 420,
+                delay: anime.stagger(45),
+              },
+              "-=360"
+            );
+
+          if (stampEl.value) {
+            anime({
+              targets: stampEl.value,
+              opacity: [0, 1],
+              scale: [0.85, 1],
+              rotate: [12, 6],
+              delay: 260,
+              duration: 520,
+              easing: "easeOutCubic",
+              complete: () => {
+                if (!stampEl.value) return;
+                stampEl.value.style.opacity = "";
+                stampEl.value.style.transform = "";
+                stampEl.value.style.transition = "";
+              },
+            });
+          }
+        });
+      }
     });
 
     onUnmounted(() => {
       if (timer) window.clearTimeout(timer);
       if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onPointer);
+      if (stampEl.value) anime.remove(stampEl.value);
+      heroEl.value?.removeEventListener("pointermove", onPointer);
     });
 
     const skills = [
@@ -321,16 +492,19 @@ export default defineComponent({
     return {
       currentText,
       heroEl,
+      stampEl,
       projects,
       experiences,
       capabilities: capabilityGroups,
-      featured: [projects[2], projects[1]],
+      featured: [projects[2], projects[3]],
       tickerTwice: [...skills, ...skills],
       onLogoError,
       tickerEl,
       onTickDown,
       onTickMove,
       onTickUp,
+      onCapEnter,
+      onCapLeave,
       location: profile.location,
       availability: profile.availability,
       email: profile.email,
@@ -356,12 +530,15 @@ export default defineComponent({
   background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 72px 72px;
-  mask-image: radial-gradient(ellipse 90% 75% at var(--spot-x) var(--spot-y), black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 90% 75% at var(--spot-x) var(--spot-y), black 30%, transparent 75%);
+  /* Static mask so pointer movements never trigger expensive mask re-rasterization */
+  mask-image: radial-gradient(ellipse 90% 75% at 62% 24%, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 75% at 62% 24%, black 30%, transparent 75%);
+  pointer-events: none;
 }
 .hero-spot {
   position: absolute; inset: 0;
   background: radial-gradient(560px 380px at var(--spot-x) var(--spot-y), var(--spot), transparent 70%);
+  pointer-events: none;
 }
 .hero-inner {
   position: relative;
@@ -372,6 +549,10 @@ export default defineComponent({
   padding-bottom: 2.5rem;
 }
 .hero-name .line { display: block; }
+.hero-word,
+.hero-dot {
+  display: inline-block;
+}
 .line--accent { color: var(--accent-strong); }
 [data-theme="dark"] .line--accent { color: var(--accent); }
 .dot { color: var(--ink); }
@@ -443,6 +624,7 @@ export default defineComponent({
 
 /* ---- skills ticker ---- */
 .ticker {
+  contain: content;
   background: transparent;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);

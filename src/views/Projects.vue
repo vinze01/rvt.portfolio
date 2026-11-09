@@ -4,8 +4,8 @@
       <div class="wrap">
         <p class="kicker" v-reveal>Projects</p>
         <h1 class="display h1" v-reveal="{ delay: 80 }">Selected<br />work<span class="accent-word">.</span></h1>
-        <p class="lead" v-reveal="{ delay: 140 }">Four builds, four different problems. Open any entry for features, stack, and source links.</p>
-        <p class="meta-row count" v-reveal="{ delay: 200 }">Index · {{ projects.length }} entries · 01–04</p>
+        <p class="lead" v-reveal="{ delay: 140 }">Five builds, five different problems. Open any entry for features, stack, and source links.</p>
+        <p class="meta-row count" v-reveal="{ delay: 200 }">Index · {{ projects.length }} entries · 01–0{{ projects.length }}</p>
       </div>
     </section>
 
@@ -15,10 +15,16 @@
           v-for="p in projects"
           :key="p.id"
           class="entry"
-          v-reveal
+          v-reveal="{ stagger: 85, selector: '.entry-img, .entry-body' }"
         >
-          <button class="entry-img" type="button" @click="openModal(p)" :aria-label="`Open details for ${p.title}`">
+          <button
+            class="entry-img"
+            type="button"
+            @click="openModal(p)"
+            :aria-label="`Open details for ${p.title}`"
+          >
             <img :src="p.image" :alt="`${p.title} screenshot`" loading="lazy" />
+            <span v-if="p.images && p.images.length > 1" class="entry-count">{{ p.images.length }} screens</span>
             <span class="entry-view">Open case <span aria-hidden="true">→</span></span>
           </button>
           <div class="entry-body">
@@ -33,7 +39,7 @@
               <li v-for="t in p.technologies" :key="t">{{ t }}</li>
             </ul>
             <div class="entry-links">
-              <button class="btn-craft btn-craft--accent btn-sm" type="button" @click="openModal(p)">Case details →</button>
+              <button class="btn-craft btn-craft--accent btn-sm" type="button" @click="openModal(p)" v-magnetic>Case details →</button>
               <a
                 v-if="p.github.length"
                 :href="p.github[0]"
@@ -67,9 +73,30 @@
       class="project-modal"
       :destroyOnClose="true"
     >
-      <div v-if="selected" class="modal" role="document">
-        <div class="modal-img">
-          <img :src="selected.image" :alt="`${selected.title} screenshot`" />
+      <div v-if="selected" ref="modalBodyEl" class="modal" role="document">
+        <div class="modal-gallery">
+          <div class="modal-img">
+            <img :src="activeImage" :alt="`${selected.title} screenshot ${activeImageIndex + 1}`" />
+            <div v-if="selectedImages.length > 1" class="gallery-nav">
+              <button type="button" class="gallery-btn" @click="prevImage" aria-label="Previous screenshot">←</button>
+              <span class="gallery-counter">{{ activeImageIndex + 1 }} / {{ selectedImages.length }}</span>
+              <button type="button" class="gallery-btn" @click="nextImage" aria-label="Next screenshot">→</button>
+            </div>
+          </div>
+          <div v-if="selectedImages.length > 1" class="gallery-thumbs" role="tablist" aria-label="Project screenshots">
+            <button
+              v-for="(img, idx) in selectedImages"
+              :key="idx"
+              type="button"
+              class="thumb-btn"
+              :class="{ 'is-active': activeImageIndex === idx }"
+              @click="activeImageIndex = idx"
+              :aria-label="`View screenshot ${idx + 1}`"
+              :aria-selected="activeImageIndex === idx ? 'true' : 'false'"
+            >
+              <img :src="img" :alt="`${selected.title} thumbnail ${idx + 1}`" loading="lazy" />
+            </button>
+          </div>
         </div>
         <p class="meta-row">{{ selected.category }} · {{ selected.index }}</p>
         <p class="modal-desc">{{ selected.longDescription }}</p>
@@ -112,22 +139,90 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, computed, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import anime from "animejs";
 import { projects, type Project } from "@/data/portfolio";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "Projects",
   props: { isDark: { type: Boolean, default: false } },
-  setup() {
+  setup: () => {
     const selected = ref<Project | null>(null);
+    const activeImageIndex = ref(0);
     const isOpen = ref(false);
+    const modalBodyEl = ref<HTMLElement | null>(null);
     const route = useRoute();
     const router = useRouter();
+    const reduced = prefersReducedMotion();
+
+    const selectedImages = computed<string[]>(() => {
+      if (!selected.value) return [];
+      return selected.value.images && selected.value.images.length > 0
+        ? selected.value.images
+        : [selected.value.image];
+    });
+
+    const activeImage = computed<string>(() => {
+      return selectedImages.value[activeImageIndex.value] || selected.value?.image || "";
+    });
+
+    const prevImage = () => {
+      const len = selectedImages.value.length;
+      if (len <= 1) return;
+      activeImageIndex.value = (activeImageIndex.value - 1 + len) % len;
+    };
+
+    const nextImage = () => {
+      const len = selectedImages.value.length;
+      if (len <= 1) return;
+      activeImageIndex.value = (activeImageIndex.value + 1) % len;
+    };
 
     const openModal = (p: Project) => {
       selected.value = p;
+      activeImageIndex.value = 0;
       isOpen.value = true;
+
+      if (!reduced) {
+        nextTick(() => {
+          window.setTimeout(() => {
+            const root = modalBodyEl.value;
+            if (!root) return;
+            const features = Array.from(root.querySelectorAll<HTMLElement>(".modal-cols ul li"));
+            const tags = Array.from(root.querySelectorAll<HTMLElement>(".modal-cols .tag-row span"));
+
+            anime
+              .timeline({
+                easing: "easeOutQuart",
+                complete: () => {
+                  [...features, ...tags].forEach((el) => {
+                    el.style.opacity = "";
+                    el.style.transform = "";
+                  });
+                },
+              })
+              .add({
+                targets: features,
+                opacity: [0, 1],
+                translateX: [-10, 0],
+                duration: 380,
+                delay: anime.stagger(30),
+              })
+              .add(
+                {
+                  targets: tags,
+                  opacity: [0, 1],
+                  translateY: [8, 0],
+                  duration: 360,
+                  delay: anime.stagger(25),
+                },
+                "-=280"
+              );
+          }, 80);
+        });
+      }
     };
     const closeModal = () => {
       isOpen.value = false;
@@ -147,7 +242,19 @@ export default defineComponent({
       }
     });
 
-    return { projects, selected, isOpen, openModal, closeModal };
+    return {
+      projects,
+      selected,
+      selectedImages,
+      activeImage,
+      activeImageIndex,
+      prevImage,
+      nextImage,
+      isOpen,
+      modalBodyEl,
+      openModal,
+      closeModal,
+    };
   },
 });
 </script>
@@ -185,6 +292,21 @@ export default defineComponent({
   transition: transform var(--dur-slow) var(--ease-out), filter var(--dur-med) ease;
 }
 .entry-img:hover img, .entry-img:focus-visible img { transform: scale(1.03); }
+.entry-count {
+  position: absolute;
+  left: 0.85rem;
+  top: 0.85rem;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+}
 .entry-view {
   position: absolute;
   right: 1rem; bottom: 1rem;
@@ -221,8 +343,76 @@ export default defineComponent({
 .text-link:hover { background: var(--accent-wash); }
 .text-link--dim { color: var(--muted); border-bottom-color: var(--line); font-weight: 600; }
 
-.modal-img { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; }
-.modal-img img { width: 100%; max-height: 380px; object-fit: cover; object-position: top; }
+.modal-gallery { margin-bottom: 1.25rem; }
+.modal-img { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
+.modal-img img { width: 100%; max-height: 420px; object-fit: contain; background: var(--bg-2); }
+.gallery-nav {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.4rem;
+}
+.gallery-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-btn:hover {
+  border-color: var(--accent-strong);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.gallery-counter {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0 0.35rem;
+  color: var(--ink);
+}
+.gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+.thumb-btn {
+  padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+.thumb-btn:hover { opacity: 0.9; }
+.thumb-btn.is-active {
+  opacity: 1;
+  border-color: var(--accent-strong);
+}
+[data-theme="dark"] .thumb-btn.is-active {
+  border-color: var(--accent);
+}
+.thumb-btn img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+}
 .modal-desc { color: var(--muted); margin: 0.8rem 0 1.5rem; line-height: 1.75; }
 .modal-cols { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.75rem; }
 .modal-cols h3 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 0.7rem; }
@@ -237,5 +427,6 @@ export default defineComponent({
   .entry:nth-child(even) .entry-img { order: 0; }
   .entry-view { opacity: 1; transform: none; }
   .modal-cols { grid-template-columns: 1fr; }
+  .gallery-thumbs { grid-template-columns: repeat(3, 1fr); }
 }
 </style>

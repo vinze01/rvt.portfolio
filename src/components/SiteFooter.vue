@@ -1,7 +1,7 @@
 <template>
   <footer class="site-footer">
     <div class="wrap-wide">
-      <div class="top">
+      <div class="top" v-reveal="{ stagger: 70, selector: '.cta-kicker, .cta-big, .col' }">
         <router-link to="/contact" class="cta-line">
           <span class="cta-kicker kicker">Next step</span>
           <span class="cta-big display">Let's build something sharp<span class="dot">.</span></span>
@@ -35,7 +35,13 @@
       <div class="bottom">
         <span class="brand-mini">RVT</span>
         <p class="copyright">© {{ year }} Robin Vince Tupil. All rights reserved.</p>
-        <button class="to-top" type="button" @click="toTop" aria-label="Back to top">↑ Top</button>
+        <button
+          class="to-top"
+          type="button"
+          @click="toTop"
+          v-magnetic="{ strength: 0.26 }"
+          aria-label="Back to top"
+        >↑ Top</button>
       </div>
     </div>
   </footer>
@@ -47,7 +53,7 @@ import { profile } from "@/data/portfolio";
 
 export default defineComponent({
   name: "SiteFooter",
-  setup() {
+  setup: () => {
     const year = new Date().getFullYear();
     const toTop = () => {
       const reduced =

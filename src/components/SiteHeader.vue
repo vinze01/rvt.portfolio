@@ -1,8 +1,8 @@
 <template>
-  <header class="site-header" :class="{ 'is-scrolled': scrolled }">
+  <header ref="headerEl" class="site-header" :class="{ 'is-scrolled': scrolled }">
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="wrap-wide bar">
-      <router-link to="/" class="brand" aria-label="RVT home">
+      <router-link to="/" class="brand" aria-label="RVT home" v-magnetic="{ strength: 0.22 }">
         <span class="brand-mark" aria-hidden="true">RVT</span>
       </router-link>
 
@@ -24,9 +24,11 @@
           <span class="avail-text">Open to work</span>
         </span>
         <button
+          ref="themeBtnEl"
           class="icon-btn"
           type="button"
-          @click="$emit('toggle-theme')"
+          @click="onToggleTheme"
+          v-magnetic="{ strength: 0.28 }"
           :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
           :title="isDark ? 'Light mode' : 'Dark mode'"
         >
@@ -36,7 +38,7 @@
         <button
           class="icon-btn menu-btn"
           type="button"
-          @click="open = !open"
+          @click="toggleMobile"
           :aria-expanded="open ? 'true' : 'false'"
           aria-controls="mobile-nav"
           aria-label="Toggle navigation menu"
@@ -49,6 +51,7 @@
 
     <nav
       id="mobile-nav"
+      ref="mobileNavEl"
       class="mobile"
       :class="{ 'is-open': open }"
       aria-label="Mobile"
@@ -68,9 +71,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from "vue";
+import { defineComponent, ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
+import anime from "animejs";
 import { BulbOutlined, BulbFilled, MenuOutlined, CloseOutlined } from "@ant-design/icons-vue";
+import { prefersReducedMotion } from "@/composables/useReveal";
 
 export default defineComponent({
   name: "SiteHeader",
@@ -79,9 +84,12 @@ export default defineComponent({
     isDark: { type: Boolean, required: true },
   },
   emits: ["toggle-theme"],
-  setup() {
+  setup: (_, { emit }) => {
     const open = ref(false);
     const scrolled = ref(false);
+    const headerEl = ref<HTMLElement | null>(null);
+    const themeBtnEl = ref<HTMLElement | null>(null);
+    const mobileNavEl = ref<HTMLElement | null>(null);
     const route = useRoute();
     const links = [
       { to: "/", label: "Home" },
@@ -90,23 +98,121 @@ export default defineComponent({
       { to: "/contact", label: "Contact" },
     ];
 
+    watch(
+      () => route.fullPath,
+      () => {
+        open.value = false;
+      }
+    );
+
     const onScroll = () => {
       scrolled.value = window.scrollY > 24;
     };
-    // Close mobile menu on route change (covers back/forward too).
-    const stopWatch = () => undefined;
+
+    const onToggleTheme = () => {
+      emit("toggle-theme");
+      if (!prefersReducedMotion() && themeBtnEl.value) {
+        anime.remove(themeBtnEl.value);
+        anime({
+          targets: themeBtnEl.value,
+          rotate: [-28, 0],
+          scale: [0.82, 1],
+          duration: 620,
+          easing: "easeOutElastic(1, .5)",
+        });
+      }
+    };
+
+    const toggleMobile = () => {
+      open.value = !open.value;
+      if (open.value && !prefersReducedMotion()) {
+        nextTick(() => {
+          const items = mobileNavEl.value?.querySelectorAll(".mobile-link");
+          if (items && items.length) {
+            anime.remove(items);
+            anime({
+              targets: items,
+              opacity: [0, 1],
+              translateX: [-18, 0],
+              duration: 460,
+              delay: anime.stagger(55, { start: 40 }),
+              easing: "easeOutExpo",
+            });
+          }
+        });
+      }
+    };
+
     onMounted(() => {
       scrolled.value = window.scrollY > 24;
       window.addEventListener("scroll", onScroll, { passive: true });
+
+      if (!prefersReducedMotion() && headerEl.value) {
+        const brand = headerEl.value.querySelector<HTMLElement>(".brand-mark");
+        const navItems = Array.from(headerEl.value.querySelectorAll<HTMLElement>(".nav-link"));
+        const actionItems = Array.from(headerEl.value.querySelectorAll<HTMLElement>(".actions > *"));
+        const all = [...(brand ? [brand] : []), ...navItems, ...actionItems];
+
+        all.forEach((el) => {
+          el.style.transition = "none";
+        });
+        anime.set(all, { opacity: 0, translateY: -8 });
+
+        requestAnimationFrame(() => {
+          anime
+            .timeline({
+              easing: "easeOutCubic",
+              complete: () => {
+                all.forEach((el) => {
+                  el.style.opacity = "";
+                  el.style.transform = "";
+                  el.style.transition = "";
+                });
+              },
+            })
+            .add({
+              targets: brand,
+              opacity: [0, 1],
+              translateY: [-8, 0],
+              duration: 420,
+            })
+            .add(
+              {
+                targets: navItems,
+                opacity: [0, 1],
+                translateY: [-8, 0],
+                duration: 420,
+                delay: anime.stagger(40),
+              },
+              "-=340"
+            )
+            .add(
+              {
+                targets: actionItems,
+                opacity: [0, 1],
+                translateY: [-8, 0],
+                duration: 420,
+                delay: anime.stagger(40),
+              },
+              "-=340"
+            );
+        });
+      }
     });
+
     onUnmounted(() => window.removeEventListener("scroll", onScroll));
 
-    return { open, scrolled, links, route, stopWatch };
-  },
-  watch: {
-    $route() {
-      this.open = false;
-    },
+    return {
+      open,
+      scrolled,
+      links,
+      route,
+      headerEl,
+      themeBtnEl,
+      mobileNavEl,
+      onToggleTheme,
+      toggleMobile,
+    };
   },
 });
 </script>
