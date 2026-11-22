@@ -4,7 +4,7 @@
       <div class="wrap">
         <p class="kicker" v-reveal>Projects</p>
         <h1 class="display h1" v-reveal="{ delay: 80 }">Selected<br />work<span class="accent-word">.</span></h1>
-        <p class="lead" v-reveal="{ delay: 140 }">Five builds, five different problems. Open any entry for features, stack, and source links.</p>
+        <p class="lead" v-reveal="{ delay: 140 }">Six builds, six different problems. Open any entry for features, stack, and source links.</p>
         <p class="meta-row count" v-reveal="{ delay: 200 }">Index · {{ projects.length }} entries · 01–0{{ projects.length }}</p>
       </div>
     </section>
@@ -23,7 +23,12 @@
             @click="openModal(p)"
             :aria-label="`Open details for ${p.title}`"
           >
-            <img :src="p.image" :alt="`${p.title} screenshot`" loading="lazy" />
+            <img
+              :src="p.image"
+              :alt="`${p.title} screenshot`"
+              loading="lazy"
+              :style="p.imagePosition ? { objectPosition: p.imagePosition } : {}"
+            />
             <span v-if="p.images && p.images.length > 1" class="entry-count">{{ p.images.length }} screens</span>
             <span class="entry-view">Open case <span aria-hidden="true">→</span></span>
           </button>
@@ -55,7 +60,7 @@
                 rel="noopener noreferrer"
                 class="text-link text-link--dim"
                 @click.stop
-              >Live demo ↗</a>
+              >{{ p.website[0].includes('chromewebstore.google.com') ? 'Chrome Web Store ↗' : 'Live demo ↗' }}</a>
               <span v-if="!p.github.length && !p.website" class="meta-row">Source unavailable</span>
             </div>
           </div>
@@ -130,7 +135,7 @@
             target="_blank"
             rel="noopener noreferrer"
             class="btn-craft btn-craft--ghost btn-sm"
-          >Live demo ↗</a>
+          >{{ w.includes('chromewebstore.google.com') ? 'Chrome Web Store ↗' : 'Live demo ↗' }}</a>
           <span v-if="!selected.github.length && !selected.website" class="meta-row">Source unavailable for this project</span>
         </div>
       </div>
@@ -272,6 +277,7 @@ export default defineComponent({
   border-bottom: 1px solid var(--line);
   align-items: start;
 }
+.entry:nth-child(even) { grid-template-columns: 0.8fr 1.2fr; }
 .entry:nth-child(even) .entry-img { order: 2; }
 .entry-img {
   position: relative;
@@ -286,7 +292,7 @@ export default defineComponent({
 }
 .entry-img img {
   width: 100%;
-  aspect-ratio: 16 / 10.5;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
   object-position: top;
   transition: transform var(--dur-slow) var(--ease-out), filter var(--dur-med) ease;
@@ -423,7 +429,7 @@ export default defineComponent({
 .modal-links { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.75rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
 
 @media (max-width: 980px) {
-  .entry, .entry:nth-child(even) .entry-img { grid-template-columns: 1fr; }
+  .entry, .entry:nth-child(even) { grid-template-columns: 1fr; }
   .entry:nth-child(even) .entry-img { order: 0; }
   .entry-view { opacity: 1; transform: none; }
   .modal-cols { grid-template-columns: 1fr; }
