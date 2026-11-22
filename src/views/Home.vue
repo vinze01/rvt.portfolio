@@ -122,7 +122,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-link text-link--dim"
-              >Live demo ↗</a>
+              >{{ p.website[0].includes('chromewebstore.google.com') ? 'Chrome Web Store ↗' : 'Live demo ↗' }}</a>
             </div>
           </div>
         </article>
@@ -692,6 +692,7 @@ export default defineComponent({
   padding: clamp(1.75rem, 4vw, 2.75rem) 0;
   border-top: 1px solid var(--line);
 }
+.feat--flip { grid-template-columns: 0.85fr 1.15fr; }
 .feat--flip .feat-img { order: 2; }
 .feat-img {
   position: relative; display: block;
@@ -782,7 +783,7 @@ export default defineComponent({
 @media (max-width: 980px) {
   .hero-inner { grid-template-columns: 1fr; }
   .hero-figure { max-width: 440px; }
-  .feat, .feat--flip .feat-img { grid-template-columns: 1fr; }
+  .feat, .feat--flip { grid-template-columns: 1fr; }
   .feat--flip .feat-img { order: 0; }
   .cap-row { grid-template-columns: 52px 1fr; }
   .cap-items { grid-column: 2; }

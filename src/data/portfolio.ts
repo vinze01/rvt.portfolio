@@ -11,6 +11,7 @@ export interface Project {
   year: string;
   image: string;
   images?: string[];
+  imagePosition?: string;
   description: string;
   longDescription: string;
   features: string[];
@@ -211,7 +212,57 @@ export const projects: Project[] = [
       "Vitest",
       "Playwright",
     ],
+    website: ["https://chromewebstore.google.com/detail/json-studio/kjdpkmlahoaocdhjdhhnmkeoniincibg"],
     github: ["https://github.com/vinze01/JSON-Studio"],
+  },
+  {
+    id: 6,
+    index: "06",
+    title: "Tiny World",
+    category: "Chrome extension · Cozy isometric game",
+    year: "Chrome MV3",
+    imagePosition: "center",
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    image: require("@/assets/tiny-world/0.jpg"),
+    images: [
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/0.jpg"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/1.jpg"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/2.jpg"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/3.jpg"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/4.jpg"),
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("@/assets/tiny-world/5.jpg"),
+    ],
+    description:
+      "A cozy miniature floating-island diorama game delivered as a Chrome Manifest V3 extension, featuring 15 Pipkin creatures, offline gardening, and procedural terrain.",
+    longDescription:
+      "Tiny World is a cozy miniature floating-island diorama game built as a Google Chrome Manifest V3 extension using Vue 3, TypeScript, Phaser 3, and Pinia. Designed for peaceful breaks throughout the day, it features a 32×16 isometric floating island across 10 progressive biome stages, 15 original Pipkin creatures with FSM-based behavioral AI, offline timestamp gardening with 14 plant species, non-destructive procedural terrain painting, 116 shop items, dynamic day/night cycles with ambient weather, multi-window IndexedDB state synchronization, and comprehensive automated test suites.",
+    features: [
+      "Isometric Diorama & 10 Biome Stages: Handcrafted 32×16 floating island expanding from Little Meadow (8×8) to Everdream Paradise (36×36) with basalt columns and water ripples",
+      "15 Original Pipkins with FSM AI: Creatures with 7 sprite-sheet animations, personality-weighted mood engines, affection bonding, feeding, and contextual interactions",
+      "Offline Timestamp Gardening: 14 plant species with 5 growth stages, non-withering offline progress calculations, batch watering/harvesting, and sprout regrowth",
+      "Procedural Landscaping & Decor: 116 placeable items with multi-select transforms, atomic multi-tile moves, and procedural neighbor-aware terrain tile edge blending",
+      "Atmospheric Time & Weather: Dynamic day/night cycle with manual 24h sky slider, 7 ambient weather particle states, 25 achievements, and a discovery journal",
+      "Multi-Surface Chrome MV3 Architecture: Playable in a Popup, docked Side Panel, or full-page tab with multi-window IndexedDB sync via Web Locks & BroadcastChannel",
+    ],
+    technologies: [
+      "Vue 3",
+      "TypeScript",
+      "Phaser 3",
+      "Chrome MV3",
+      "Pinia",
+      "Vite",
+      "IndexedDB",
+      "Vitest",
+      "Playwright",
+    ],
+    website: ["https://chromewebstore.google.com/detail/tiny-world/olhoggikajcnkjjfgmbknjknknfbbobb"],
+    github: ["https://github.com/vinze01/Tiny-World"],
   },
 ];
 
